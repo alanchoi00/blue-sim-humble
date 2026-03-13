@@ -27,6 +27,18 @@ RUN apt-get -q update \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 
+# Ubuntu 22.04 Jammy ships CMake 3.22; some packages require 3.23+.
+# Install a newer CMake from Kitware's apt repo.
+RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null \
+        | gpg --dearmor - \
+        | tee /usr/share/keyrings/kitware-archive-keyring.gpg > /dev/null \
+    && echo "deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main" \
+        | tee /etc/apt/sources.list.d/kitware.list > /dev/null \
+    && apt-get -q update \
+    && apt-get -q install --no-install-recommends -y cmake \
+    && apt-get clean -y \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install all ROS dependencies for _just_ blue
 # (we have not imported other repos from .repos files)
 RUN apt-get -q update \
