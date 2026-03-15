@@ -16,7 +16,7 @@ RUN apt-get -q update \
     clang-format-14 \
     clang-tidy \
     clang-tools \
-    ros-${ROS_DISTRO}-tinyxml2-vendor \
+    libtinyxml2-dev \
     python3-pip \
     python3-dev \
     python3-venv \
@@ -39,6 +39,17 @@ RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/nul
     && apt-get -q install --no-install-recommends -y cmake \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
+
+# Ubuntu 22.04's libtinyxml2-dev does not ship TinyXML2Config.cmake.
+# Build tinyxml2 from source (matching the distro version) so that
+# find_package(TinyXML2) succeeds during colcon build.
+RUN git clone --depth 1 -b 9.0.0 https://github.com/leethomason/tinyxml2.git /tmp/tinyxml2 \
+    && cmake -S /tmp/tinyxml2 -B /tmp/tinyxml2/build \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DBUILD_SHARED_LIBS=ON \
+    && cmake --build /tmp/tinyxml2/build \
+    && cmake --install /tmp/tinyxml2/build \
+    && rm -rf /tmp/tinyxml2
 
 # Install all ROS dependencies for _just_ blue
 # (we have not imported other repos from .repos files)
