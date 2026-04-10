@@ -123,6 +123,7 @@ RUN git clone --depth 1 --recursive -b ${MAVLINK_RELEASE} https://github.com/ros
 WORKDIR $USER_WORKSPACE
 RUN sudo apt-get -q update \
     && sudo apt-get -q -y upgrade \
+    && sudo apt-get -q install --no-install-recommends -y libtinyxml2-dev \
     && vcs import src < src/blue/blue.repos \
     && rosdep update \
     && rosdep install -y --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} \
