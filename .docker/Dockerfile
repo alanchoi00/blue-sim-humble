@@ -25,10 +25,7 @@ RUN apt-get -q update \
     software-properties-common \
     && apt-get autoremove -y \
     && apt-get clean -y \
-    && rm -rf /var/lib/apt/lists/* \
-    && wget -O /tmp/cmake.sh https://github.com/Kitware/CMake/releases/download/v3.28.3/cmake-3.28.3-linux-x86_64.sh \
-    && sh /tmp/cmake.sh --skip-license --prefix=/usr/local \
-    && rm /tmp/cmake.sh
+    && rm -rf /var/lib/apt/lists/*
 
 # Install all ROS dependencies for _just_ blue
 # (we have not imported other repos from .repos files)
@@ -58,9 +55,7 @@ ARG USERNAME=ubuntu
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
-RUN groupadd --gid $USER_GID $USERNAME \
-    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
-    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+RUN echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME \
     && usermod -a -G dialout $USERNAME \
     && echo "source /usr/share/bash-completion/completions/git" >> /home/$USERNAME/.bashrc
@@ -123,7 +118,6 @@ RUN git clone --depth 1 --recursive -b ${MAVLINK_RELEASE} https://github.com/ros
 WORKDIR $USER_WORKSPACE
 RUN sudo apt-get -q update \
     && sudo apt-get -q -y upgrade \
-    && sudo apt-get -q install --no-install-recommends -y libtinyxml2-dev \
     && vcs import src < src/blue/blue.repos \
     && rosdep update \
     && rosdep install -y --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} \
@@ -133,7 +127,7 @@ RUN sudo apt-get -q update \
 
 # Actually build workspace
 RUN . "/opt/ros/${ROS_DISTRO}/setup.sh" \
-    && MAKEFLAGS="-j$(nproc)" colcon build --parallel-workers $(nproc)
+    && colcon build
 
 RUN echo "source ${USER_WORKSPACE}/install/setup.bash" >> /home/$USERNAME/.bashrc \
     && echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /home/$USERNAME/.bashrc \
