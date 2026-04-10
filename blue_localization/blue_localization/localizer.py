@@ -44,7 +44,7 @@ from rclpy.qos import (
     HistoryPolicy,
     QoSProfile,
     ReliabilityPolicy,
-    qos_profile_default,
+    qos_profile_system_default as qos_profile_default,
     qos_profile_sensor_data,
 )
 from scipy.spatial.transform import Rotation as R
