@@ -1,27 +1,24 @@
 name: Docker
 
 on:
-  # Triggers disabled: this fork is used for local ROS 2 Humble simulation
-  # development (thesis work) and does not publish images to a registry.
-  # The upstream workflow (Robotic-Decision-Making-Lab/blue) handles
-  # scheduled builds and pushes to GHCR. Re-enable triggers below if
-  # image publishing is ever needed.
-  #
-  # schedule:
-  #   - cron: "0 17 * * 6"
-  # push:
-  #   branches:
-  #     - main
-  # pull_request:
-  #   paths:
-  #     - .docker/**
-  #     - .github/workflows/docker.yaml
-  #     - blue.repos
-  #     - requirements-build.txt
+  push:
+    branches:
+      - main
+    paths:
+      - .docker/**
+      - .github/workflows/docker.yaml
+      - blue.repos
+      - requirements-build.txt
+  pull_request:
+    paths:
+      - .docker/**
+      - .github/workflows/docker.yaml
+      - blue.repos
+      - requirements-build.txt
   workflow_dispatch:
 
 env:
-  PUSH: ${{ (github.event_name != 'pull_request') && (github.repository == 'Robotic-Decision-Making-Lab/blue') }}
+  PUSH: ${{ (github.event_name != 'pull_request') && (github.repository == 'alanchoi00/blue-sim-humble') }}
 
 jobs:
   docker_build:
@@ -44,12 +41,6 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        with:
-          # Pin docker-buildx to this version for now
-          #  v0.19.2 has issues with empty keys,
-          #  particularly the "*.cache-to=" used below
-          #
-          version: v0.18.0
 
       - if: env.PUSH == 'true'
         name: Log into registry
@@ -116,6 +107,7 @@ jobs:
           BLUE_ROS_DISTRO: ${{ matrix.ROS_DISTRO }}
           BLUE_GITHUB_REPO: ${{ steps.lowercase-repo.outputs.repository }}
         with:
+          source: "."  # use local checkout; prevents bake-action v6 from injecting GitHub URL as build source
           workdir: .docker
           files: |
             ./docker-bake.hcl
@@ -124,11 +116,8 @@ jobs:
             ${{ steps.meta-desktop.outputs.bake-file }}
             ${{ steps.meta-desktop-nvidia.outputs.bake-file }}
           push: ${{ env.PUSH }}
-          set: |
-            *.cache-from=type=registry,ref=ghcr.io/${{ steps.lowercase-repo.outputs.repository }}:cache-${{ matrix.ROS_DISTRO }}
-            *.cache-to=type=registry,mode=max,ref=ghcr.io/${{ steps.lowercase-repo.outputs.repository }}:cache-${{ matrix.ROS_DISTRO }}
 
-      # Pull request builds are not cached; and only built for AMD64
+      # Pull request builds are only built for AMD64
       - if: github.event_name == 'pull_request'
         name: Build and push (PR)
         uses: docker/bake-action@v6.5.0
@@ -142,5 +131,3 @@ jobs:
             ./docker-bake.hcl
           set: |
             *.platform=linux/amd64
-            *.cache-from=type=registry,ref=ghcr.io/${{ steps.lowercase-repo.outputs.repository }}:cache-${{ matrix.ROS_DISTRO }}
-            *.cache-to=

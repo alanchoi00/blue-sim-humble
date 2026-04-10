@@ -33,62 +33,53 @@ target "docker-metadata-action-desktop-nvidia" {}
 #
 target "ci" {
   inherits = ["docker-metadata-action-ci"]
-  dockerfile = ".docker/Dockerfile"
+  dockerfile = ".docker/Dockerfile.humble"
   target = "ci"
   context = ".."
-  args = {
-    ROS_DISTRO = "${BLUE_ROS_DISTRO}"
-  }
   tags = [
     "ghcr.io/${BLUE_GITHUB_REPO}:${BLUE_ROS_DISTRO}-ci"
   ]
   labels = {
     "org.opencontainers.image.source" = "https://github.com/${BLUE_GITHUB_REPO}"
   }
-  cache_from =[
-    "ghcr.io/${BLUE_GITHUB_REPO}:cache-${BLUE_ROS_DISTRO}-ci",
-    "ghcr.io/${BLUE_GITHUB_REPO}:cache-${BLUE_ROS_DISTRO}-robot",
-    "ghcr.io/${BLUE_GITHUB_REPO}:cache-${BLUE_ROS_DISTRO}-desktop",
-    "ghcr.io/${BLUE_GITHUB_REPO}:cache-${BLUE_ROS_DISTRO}-desktop-nvidia",
-    "type=local,dest=.docker-cache"
-  ]
-  cache_to = [
-    "type=local,dest=.docker-cache"
-  ]
   platforms = ["linux/amd64", "linux/arm64"]
 }
 
 target "robot" {
-  inherits = [ "ci", "docker-metadata-action-robot" ]
+  inherits = ["docker-metadata-action-robot"]
+  dockerfile = ".docker/Dockerfile.humble"
   target = "robot"
+  context = ".."
   tags = [
     "ghcr.io/${BLUE_GITHUB_REPO}:${BLUE_ROS_DISTRO}-robot"
   ]
-  cache_to = [
-    "type=local,dest=.docker-cache"
-  ]
+  labels = {
+    "org.opencontainers.image.source" = "https://github.com/${BLUE_GITHUB_REPO}"
+  }
+  platforms = ["linux/amd64", "linux/arm64"]
 }
 
 target "desktop" {
-  inherits = [ "ci", "docker-metadata-action-desktop" ]
+  inherits = ["docker-metadata-action-desktop"]
+  dockerfile = ".docker/Dockerfile.humble"
   target = "desktop"
+  context = ".."
+  args = {
+    ROS_DISTRO = "${BLUE_ROS_DISTRO}"
+  }
   tags = [
     "ghcr.io/${BLUE_GITHUB_REPO}:${BLUE_ROS_DISTRO}-desktop"
   ]
-  cache_to = [
-    "type=local,dest=.docker-cache"
-  ]
-  # amd64 only builds for desktop and desktop-nvidia
+  labels = {
+    "org.opencontainers.image.source" = "https://github.com/${BLUE_GITHUB_REPO}"
+  }
   platforms = ["linux/amd64"]
 }
 
 target "desktop-nvidia" {
-  inherits = [ "desktop", "docker-metadata-action-desktop-nvidia" ]
+  inherits = ["desktop", "docker-metadata-action-desktop-nvidia"]
   target = "desktop-nvidia"
   tags = [
     "ghcr.io/${BLUE_GITHUB_REPO}:${BLUE_ROS_DISTRO}-desktop-nvidia"
-  ]
-  cache_to = [
-    "type=local,dest=.docker-cache"
   ]
 }
