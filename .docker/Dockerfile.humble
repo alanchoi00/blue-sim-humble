@@ -13,9 +13,8 @@ FROM ghcr.io/robotic-decision-making-lab/blue:humble-robot AS robot
 
 ENV USER_WORKSPACE=/home/ubuntu/ws_blue
 
-COPY --chown=ubuntu:ubuntu . $USER_WORKSPACE/src/blue
+COPY . $USER_WORKSPACE/src/blue
 
-USER ubuntu
 RUN . "/opt/ros/humble/setup.sh" \
     && . "$USER_WORKSPACE/install/setup.sh" \
     && MAKEFLAGS="-j$(nproc)" colcon build \
@@ -26,9 +25,8 @@ FROM ghcr.io/robotic-decision-making-lab/blue:humble-desktop AS desktop
 
 ENV USER_WORKSPACE=/home/ubuntu/ws_blue
 
-COPY --chown=ubuntu:ubuntu . $USER_WORKSPACE/src/blue
+COPY . $USER_WORKSPACE/src/blue
 
-USER ubuntu
 RUN . "/opt/ros/humble/setup.sh" \
     && . "$USER_WORKSPACE/install/setup.sh" \
     && MAKEFLAGS="-j$(nproc)" colcon build \
@@ -39,9 +37,8 @@ FROM ghcr.io/robotic-decision-making-lab/blue:humble-desktop-nvidia AS desktop-n
 
 ENV USER_WORKSPACE=/home/ubuntu/ws_blue
 
-COPY --chown=ubuntu:ubuntu . $USER_WORKSPACE/src/blue
+COPY . $USER_WORKSPACE/src/blue
 
-USER ubuntu
 RUN . "/opt/ros/humble/setup.sh" \
     && . "$USER_WORKSPACE/install/setup.sh" \
     && MAKEFLAGS="-j$(nproc)" colcon build \
