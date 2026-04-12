@@ -38,7 +38,7 @@ def generate_launch_description():
         description="Open RViz",
     )
     declare_use_joy = DeclareLaunchArgument(
-        "use_joy",
+        "use_teleop_joy",
         default_value="false",
         description="Use joystick for teleoperation",
     )
@@ -153,7 +153,7 @@ def generate_launch_description():
                         "launch/joystick.launch.yaml",
                     ])
                 ),
-                condition=LaunchConfigurationEquals("use_joy", "true"),
+                condition=LaunchConfigurationEquals("use_teleop_joy", "true"),
             ),
         ],
     )
