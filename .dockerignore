@@ -6,6 +6,9 @@
 !blue_localization
 !blue_description
 !blue_demos
+!blue_control
+!blue_teleop
+!blue_sim
 !blue.repos
 !sim.repos
 !.docker/entrypoints
