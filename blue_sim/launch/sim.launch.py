@@ -47,6 +47,14 @@ def generate_launch_description():
         default_value="false",
         description="Use keyboard for teleoperation",
     )
+    declare_gazebo_world_file = DeclareLaunchArgument(
+        "gazebo_world_file",
+        default_value=PathJoinSubstitution([
+            FindPackageShare("blue_description"),
+            "gazebo/worlds/underwater.world",
+        ]),
+        description="Path to Gazebo world file",
+    )
 
     robot_description_heavy = Command([
         "xacro ",
@@ -79,6 +87,7 @@ def generate_launch_description():
             "use_sim": use_sim,
             "use_rviz": use_rviz,
             "robot_description": robot_description_heavy,
+            "gazebo_world_file": LaunchConfiguration("gazebo_world_file"),
         }.items(),
         condition=LaunchConfigurationEquals("model", "bluerov2_heavy"),
     )
@@ -94,6 +103,7 @@ def generate_launch_description():
             "use_sim": use_sim,
             "use_rviz": use_rviz,
             "robot_description": robot_description_standard,
+            "gazebo_world_file": LaunchConfiguration("gazebo_world_file"),
         }.items(),
         condition=LaunchConfigurationEquals("model", "bluerov2"),
     )
@@ -164,6 +174,7 @@ def generate_launch_description():
         declare_use_rviz,
         declare_use_key,
         declare_use_joy,
+        declare_gazebo_world_file,
         bringup_heavy,
         bringup_standard,
         controllers_heavy,
