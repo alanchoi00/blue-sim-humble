@@ -46,5 +46,6 @@ jobs:
             echo 'APT::Get::AllowUnauthenticated "true";' | sudo tee -a /etc/apt/apt.conf.d/99-ros-insecure > /dev/null
           CXXFLAGS: >-
             -Wall -Wextra -Wpedantic -Wwrite-strings -Wunreachable-code -Wpointer-arith -Wredundant-decls
+          ROSDEP_SKIP_KEYS: message_transforms
           CC: ${{ env.CLANG_TIDY && 'clang' }}
           CXX: ${{ env.CLANG_TIDY && 'clang++' }}
