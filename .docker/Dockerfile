@@ -11,7 +11,8 @@ RUN sed -i 's|signed-by=/usr/share/keyrings/ros-archive-keyring.gpg||g' \
     /etc/apt/sources.list.d/*.list 2>/dev/null || true \
     && sed -i '/^Signed-By/d' /etc/apt/sources.list.d/*.sources 2>/dev/null || true \
     && echo 'Acquire::AllowInsecureRepositories "true";' | tee /etc/apt/apt.conf.d/99-ros-insecure > /dev/null \
-    && echo 'APT::Get::AllowUnauthenticated "true";' | tee -a /etc/apt/apt.conf.d/99-ros-insecure > /dev/null
+    && echo 'APT::Get::AllowUnauthenticated "true";' | tee -a /etc/apt/apt.conf.d/99-ros-insecure > /dev/null \
+    && echo 'Acquire::Retries "5";' | tee /etc/apt/apt.conf.d/80-retries > /dev/null
 
 # Install apt packages needed for CI
 RUN apt-get -q update \
